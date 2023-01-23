@@ -1,0 +1,109 @@
+<style>
+  :host {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 14px;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+</style>
+
+<div class="content" role="main">
+  <h3>{{title}}</h3>
+  <div>
+    <form [formGroup]="formLogic" (ngSubmit)="onSubmit()">
+      <div>
+        <label>Do
+          <select id="do" formControlName="do">
+            
+            <option value="">Select</option>
+            <option *ngFor="let doOption of logicFormData.doOptions" [value]="doOption">
+              {{doOption}}
+            </option>
+
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>Target
+          <select id="target" formControlName="target">
+            <option value="">Select</option>
+            <option *ngFor="let target of logicFormData.fields" [value]="target.id">
+              {{target.label}}</option>
+          </select>
+        </label>
+      </div>
+      
+      <hr />
+      <ng-container formArrayName="conditions">
+        <ng-container *ngFor="let cond of conditions.controls; let i = index" [formGroupName]="i">
+            <div>
+              <label>If
+                <select id="condition" formControlName="condition">
+                  <option value="">Select</option>
+                  <option *ngFor="let opt of logicFormData.fields" [value]="opt.id">
+              {{opt.label}}</option>
+                </select>
+              </label>
+            </div>
+          
+            <div>
+              <label>Operator
+                <select id="operator" formControlName="operator">
+                  <option value="">Select</option>
+                  <option *ngFor="let operator of logicFormData.operators" [value]="operator">
+              {{operator}}</option>
+                </select>
+              </label>
+            </div>
+
+            <div>
+              <label>Value Type
+                <select id="valueType" formControlName="valueType">
+                  <option value="">Select</option>
+                  <option *ngFor="let valueType of logicFormData.valueTypes" [value]="valueType">
+              {{valueType}}</option>
+                </select>
+              </label>
+            </div>
+
+            <div *ngIf="conditions.value[i]?.condition !== ''">
+              <ng-container [ngSwitch]="logicFormData.valueOptions.has(conditions.value[i]?.condition)">
+                <ng-container *ngSwitchCase="false">
+                  <label>Value
+                    <input formControlName="value" />
+                  </label>
+                </ng-container>
+                <ng-container *ngSwitchCase="true">
+                  <label>Value
+                    <select formControlName="value">
+                      <option value="">Select</option>
+                      <option *ngFor="let option of logicFormData.valueOptions.get(conditions.value[i]?.condition)" [value]="option.id">{{ option.label }}</option>
+                    </select>
+                  </label>
+                </ng-container>
+              </ng-container>
+            </div>
+          <button (click)="deleteCondition(i)">-</button>
+        </ng-container>
+      </ng-container>
+      
+      <div *ngIf="conditions.length > 1">
+        <select id="logicOperator" formControlName="logicOperator" >
+          <option value="or">Any</option>
+          <option value="and">All</option>
+        </select>
+      </div>
+      
+      <button (click)="addCondition()">+</button>
+      <button type="submit">submit</button>
+    </form>
+    
+    <div>
+      <br>
+      <code>{{expression}}</code>
+      <hr>
+    </div>
+    <br />
+  </div>
+</div>
